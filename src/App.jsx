@@ -19,13 +19,28 @@ const SORT_FIELD_ALPHABETICALLY = 'alphabetically';
 const SORT_FIELD_LENGTH = 'length';
 
 export const App = () => {
-  const [goods, setGoods] = useState(goodsFromServer);
   const [sortField, setSortField] = useState(null);
   const [isReversed, setIsReversed] = useState(false);
 
   const handleSort = field => {
-    const sorted = [...goodsFromServer].sort((a, b) => {
-      switch (field) {
+    setSortField(field);
+    setIsReversed(false);
+  };
+
+  const handleReverse = () => {
+    setIsReversed(prev => !prev);
+  };
+
+  const reset = () => {
+    setSortField(null);
+    setIsReversed(false);
+  };
+
+  const preparedGoods = [...goodsFromServer];
+
+  if (sortField) {
+    preparedGoods.sort((a, b) => {
+      switch (sortField) {
         case SORT_FIELD_ALPHABETICALLY:
           return a.localeCompare(b);
         case SORT_FIELD_LENGTH:
@@ -34,24 +49,11 @@ export const App = () => {
           return 0;
       }
     });
+  }
 
-    setGoods(sorted);
-    setSortField(field);
-    setIsReversed(false);
-  };
-
-  const handleReverse = () => {
-    const reversed = [...goods].reverse();
-
-    setGoods(reversed);
-    setIsReversed(prev => !prev);
-  };
-
-  const reset = () => {
-    setGoods(goodsFromServer);
-    setSortField(null);
-    setIsReversed(false);
-  };
+  if (isReversed) {
+    preparedGoods.reverse();
+  }
 
   return (
     <div className="section content">
@@ -91,7 +93,7 @@ export const App = () => {
       </div>
 
       <ul>
-        {goods.map(good => (
+        {preparedGoods.map(good => (
           <li key={good} data-cy="Good">
             {good}
           </li>
